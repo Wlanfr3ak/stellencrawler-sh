@@ -1,0 +1,60 @@
+# Beispiel-Konfiguration – als config.yaml kopieren und anpassen.
+
+# Versionsnummer – muss parallel zur VERSION-Datei hochgezaehlt werden (s. AGENTS.md)
+version: "0.10.2"
+
+# Pfade (relativ zum Projektordner)
+database: data/jobs.db
+pdf_dir: archive/pdf
+
+# Höflichkeitspause zwischen Detail-Abrufen (Sekunden)
+request_delay: 0.4
+
+# Identifikation gegenüber den Portal-Betreibern. Wird bei allen
+# HTTP-Requests (Crawler) und im PDF-Browser (Playwright) gesendet.
+# Bitte eigene E-Mail-Adresse eintragen, damit Admins bei Problemen
+# Kontakt aufnehmen können statt direkt zu sperren.
+# "{version}" wird automatisch aus der VERSION-Datei ersetzt.
+user_agent: "stellencrawler/{version} (privates, nicht-kommerzielles Stellenarchiv; Kontakt: mail@example.org)"
+
+# Suchbegriffe fuer die Portal-Trefferliste (leer = alle Stellen)
+queries:
+  - ""
+
+# Empfaenger der Benachrichtigungs-Mails – pro Person eigene Keywords.
+# Matching: lokale Volltextsuche (Titel, Behoerde, Ort, Feldwerte,
+# Anzeigentext), Praefix-Logik, mehrteilige Begriffe = AND.
+#   keywords        -> Volltext (eindeutige/starke Begriffe)
+#   title_keywords  -> nur TITEL (Begriffe, die im Fliesstext rauschen:
+#                      'EDV-Kenntnisse', 'Netzwerk aufbauen' = Kooperation)
+#   exclude_title   -> Negativ-Filter auf den Titel (Stelle fliegt raus)
+#   home_plz        -> Heimat-PLZ; Mail/matches zeigen grobe Luftlinien-
+#                      Entfernung je Stelle (pgeocode/GeoNames)
+# Mit `python -m stellencrawler matches` testen, was die Keywords treffen.
+recipients:
+  - name: Beispiel Person
+    email: person@example.org
+    keywords:
+      - Informatik
+      - Cyber
+    title_keywords:
+      - IT
+      - EDV
+      - Netzwerk
+    # Negativ-Filter: Stellen, deren TITEL einen dieser Begriffe
+    # enthaelt, werden NICHT gemeldet. Nur Titel, weil z. B.
+    # 'Ausbildung' im Volltext fast ueberall als Anforderung steht.
+    exclude_title:
+      - Ausbildung
+      - Auszubildende
+      - Duales Studium
+      - Werkstudent
+    home_plz: "24105"   # Beispiel: Schleswig-Holsteinischer Landtag, Kiel
+
+# SMTP-Zugang fuer die Benachrichtigungs-Mails
+smtp:
+  host: smtp.example.com
+  port: 587        # 587 = STARTTLS, 465 = SSL
+  user:
+  password:
+  from: stellencrawler@example.org
